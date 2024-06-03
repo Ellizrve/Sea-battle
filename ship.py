@@ -64,10 +64,35 @@ class Ship:
         if self._is_move:
             pass
 
-    def is_collide(self, ship): #нужно доделать, можно ли подсказку?
+    def is_collide(self, ship): #нужно доделать
         """Checking for collision with another ship"""
         if ship._x is None and ship._y is None:
             return False
+        if self._x == ship._x or self._x == ship._y:
+            return True
+        if self._y == ship._x or self._y == ship._y:
+            return True
+        if self._tp == 1:
+            counter_x = self._x
+            for line in range(self._length):
+                if counter_x == ship._x and self._y + 1 == ship._y:
+                    return True
+                if counter_x == ship._x and self._y == ship._y:
+                    return True
+                if counter_x == ship._x and self._y - 1 == ship._y:
+                    return True
+                counter_x += 1
+        if self._tp == 2:
+            counter_y = self._y
+            for line in range(self._length):
+                if counter_y == ship._y and self._y + 1 == ship._x:
+                    return True
+                if counter_y == ship._y and self._y == ship._x:
+                    return True
+                if counter_y == ship._y and self._y - 1 == ship._x:
+                    return True
+                counter_y += 1
+        return False
 
     def is_out_pole(self, game_pole_size):
         """Checking for the ship to leave the playing pole"""

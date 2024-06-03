@@ -53,28 +53,30 @@ class GamePole:
                 x_coord += 1
                 counter += 1
 
+    def is_collide_collection(self, obj, collection):
+        for checking_object in collection:
+            if obj.is_collide(checking_object):
+                return True
+            return False
+
     def __install_coords(self):
         """Assignment of start coordinates"""
         initial_limit = 0
         final_limit = self._size - 1
         for ship in self._ships:
-            intersection = True
             checking_ships = self._ships[:]
             checking_ships.remove(ship)
+            intersection = True
             while intersection is True:
                 coord_x = randint(initial_limit, final_limit)
                 coord_y = randint(initial_limit, final_limit)
                 ship.set_start_coords(coord_x, coord_y)
                 if ship.is_out_pole(self._size):
                     continue
+                if self.is_collide_collection(ship, checking_ships):
+                    continue
+                intersection = False
                 self.__put_on(ship)
-                intersection_checklist = []
-                for checking_ship in checking_ships:
-                    intersection_checklist.append(ship.is_collide(checking_ship))
-                if any(intersection_checklist):
-                    intersection = True
-                else:
-                    intersection = False
 
     def init(self):
         """Initial initialization of the game pole"""
