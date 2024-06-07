@@ -2,6 +2,7 @@
 # в направлении ориентации корабля; если перемещение в выбранную сторону невозможно (другой корабль или пределы
 # игрового поля), то попытаться переместиться в противоположную сторону, иначе (если перемещения невозможны), оставаться на месте;
 
+import random
 from random import randint
 
 
@@ -55,21 +56,23 @@ class GamePole:
 
     def is_collide_collection(self, obj, collection):
         for checking_object in collection:
-            if obj.is_collide(checking_object):
+            if obj.is_collide(checking_object, self):
                 return True
-            return False
+        return False
 
     def __install_coords(self):
         """Assignment of start coordinates"""
-        initial_limit = 0
-        final_limit = self._size - 1
         for ship in self._ships:
+            initial_limit = 0
+            final_limit = self._size
             checking_ships = self._ships[:]
             checking_ships.remove(ship)
             intersection = True
+            coords_x = [x for x in range(initial_limit, final_limit)]
+            coords_y = [y for y in range(initial_limit, final_limit)]
             while intersection is True:
-                coord_x = randint(initial_limit, final_limit)
-                coord_y = randint(initial_limit, final_limit)
+                coord_x = random.choice(coords_x)
+                coord_y = random.choice(coords_y)
                 ship.set_start_coords(coord_x, coord_y)
                 if ship.is_out_pole(self._size):
                     continue

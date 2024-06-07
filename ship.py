@@ -1,8 +1,5 @@
 # move(go) - перемещение корабля в направлении его ориентации на go клеток (go = 1 - движение в одну сторону на клетку;
 # go = -1 - движение в другую сторону на одну клетку); движение возможно только если флаг _is_move = True;
-# is_collide(ship) - проверка на столкновение с другим кораблем ship (столкновением считается, если другой корабль или
-# пересекается с текущим или просто соприкасается, в том числе и по диагонали); метод возвращает True, если столкновение
-# есть и False - в противном случае;
 
 class Ship:
     """This class provide work with ships and description it"""
@@ -33,7 +30,7 @@ class Ship:
             raise TypeError('Invalid orientation value. Please enter an integer value: 1 (horizontal) or 2 (vertical)')
 
     @classmethod
-    def __check_coord(cls, coord): #тут вопрос, нужно ли реализовывать этот метод или нет, если да, то  правильно ли
+    def __check_coord(cls, coord):
         """Checking for correct coordinate"""
         if type(coord) != int or coord not in range(0, GamePole._size):
             raise TypeError(f'Incorrect {coord} coordinate value. Please enter an integer value from 0 to {GamePole._size}')
@@ -64,34 +61,130 @@ class Ship:
         if self._is_move:
             pass
 
-    def is_collide(self, ship): #нужно доделать
+    def is_collide(self, ship, pole):
         """Checking for collision with another ship"""
         if ship._x is None and ship._y is None:
             return False
-        if self._x == ship._x or self._x == ship._y:
-            return True
-        if self._y == ship._x or self._y == ship._y:
-            return True
+
+        if self._x == 0 and self._y == 0:
+            if pole._pole[self._y + 1][self._x] == 1 or pole._pole[self._y][self._x + 1] == 1 or \
+                    pole._pole[self._y + 1][self._x + 1] == 1:
+                return True
+        if self._x == 0 and self._y == 9:
+            if pole._pole[self._y - 1][self._x] == 1 or pole._pole[self._y][self._x + 1] == 1 or \
+                    pole._pole[self._y - 1][self._x + 1] == 1:
+                return True
+        if self._x == 9 and self._y == 0:
+            if pole._pole[self._y + 1][self._x] == 1 or pole._pole[self._y][self._x - 1] == 1 or \
+                    pole._pole[self._y + 1][self._x - 1] == 1:
+                return True
+        if self._x == 9 and self._y == 9:
+            if pole._pole[self._y - 1][self._x] == 1 or pole._pole[self._y][self._x - 1] == 1 or \
+                    pole._pole[self._y - 1][self._x - 1] == 1:
+                return True
+
         if self._tp == 1:
             counter_x = self._x
             for line in range(self._length):
-                if counter_x == ship._x and self._y + 1 == ship._y:
-                    return True
-                if counter_x == ship._x and self._y == ship._y:
-                    return True
-                if counter_x == ship._x and self._y - 1 == ship._y:
-                    return True
+
+                if self._x in range(1, 9):
+
+                    if self._y in range(1, 9):
+                        if pole._pole[self._y - 1][counter_x - 1] == 1 or pole._pole[self._y - 1][counter_x] == 1 or \
+                                pole._pole[self._y - 1][counter_x + 1] == 1:
+                            return True
+                        if pole._pole[self._y][counter_x - 1] == 1 or pole._pole[self._y][counter_x] == 1 or \
+                                pole._pole[self._y][counter_x + 1] == 1:
+                            return True
+                        if pole._pole[self._y + 1][counter_x - 1] == 1 or pole._pole[self._y + 1][counter_x] == 1 or \
+                                pole._pole[self._y + 1][counter_x + 1] == 1:
+                            return True
+
+                    if self._y == 0:
+                        if pole._pole[self._y][counter_x - 1] == 1 or pole._pole[self._y][counter_x] == 1 or \
+                                pole._pole[self._y][counter_x + 1] == 1:
+                            return True
+                        if pole._pole[self._y + 1][counter_x - 1] == 1 or pole._pole[self._y + 1][counter_x] == 1 or \
+                                pole._pole[self._y + 1][counter_x + 1] == 1:
+                            return True
+
+                    if self._y == 9:
+                        if pole._pole[self._y - 1][counter_x - 1] == 1 or pole._pole[self._y - 1][counter_x] == 1 or \
+                                pole._pole[self._y - 1][counter_x + 1] == 1:
+                            return True
+                        if pole._pole[self._y][counter_x - 1] == 1 or pole._pole[self._y][counter_x] == 1 or \
+                                pole._pole[self._y][counter_x + 1] == 1:
+                            return True
+
+                if self._x == 0:
+                    if pole._pole[self._y - 1][counter_x] == 1 or pole._pole[self._y - 1][counter_x + 1] == 1:
+                        return True
+                    if pole._pole[self._y][counter_x] == 1 or pole._pole[self._y][counter_x + 1] == 1:
+                        return True
+                    if pole._pole[self._y + 1][counter_x] == 1 or pole._pole[self._y + 1][counter_x + 1] == 1:
+                        return True
+
+                if self._x == 9:
+                    if pole._pole[self._y - 1][counter_x] == 1 or pole._pole[self._y - 1][counter_x - 1] == 1:
+                        return True
+                    if pole._pole[self._y][counter_x] == 1 or pole._pole[self._y][counter_x - 1] == 1:
+                        return True
+                    if pole._pole[self._y + 1][counter_x] == 1 or pole._pole[self._y + 1][counter_x - 1] == 1:
+                        return True
+
                 counter_x += 1
+
         if self._tp == 2:
             counter_y = self._y
             for line in range(self._length):
-                if counter_y == ship._y and self._y + 1 == ship._x:
-                    return True
-                if counter_y == ship._y and self._y == ship._x:
-                    return True
-                if counter_y == ship._y and self._y - 1 == ship._x:
-                    return True
+
+                if counter_y in range(1, 9):
+
+                    if self._x in range(1, 9):
+                        if pole._pole[counter_y - 1][self._x - 1] == 1 or pole._pole[counter_y - 1][self._x] == 1 or \
+                                pole._pole[counter_y - 1][self._x + 1] == 1:
+                            return True
+                        if pole._pole[counter_y][self._x - 1] == 1 or pole._pole[counter_y][self._x] == 1 or \
+                                pole._pole[counter_y][self._x + 1] == 1:
+                            return True
+                        if pole._pole[counter_y + 1][self._x - 1] == 1 or pole._pole[counter_y + 1][self._x] == 1 or \
+                                pole._pole[counter_y + 1][self._x + 1] == 1:
+                            return True
+
+                    if self._x == 0:
+                        if pole._pole[counter_y - 1][self._x] == 1 or pole._pole[counter_y - 1][self._x + 1] == 1:
+                            return True
+                        if pole._pole[counter_y][self._x] == 1 or pole._pole[counter_y][self._x + 1] == 1:
+                            return True
+                        if pole._pole[counter_y + 1][self._x] == 1 or pole._pole[counter_y + 1][self._x + 1] == 1:
+                            return True
+
+                    if self._x == 9:
+                        if pole._pole[counter_y - 1][self._x] == 1 or pole._pole[counter_y - 1][self._x - 1] == 1:
+                            return True
+                        if pole._pole[counter_y][self._x] == 1 or pole._pole[counter_y][self._x - 1] == 1:
+                            return True
+                        if pole._pole[counter_y + 1][self._x] == 1 or pole._pole[counter_y + 1][self._x - 1] == 1:
+                            return True
+
+                if counter_y == 0:
+                    if pole._pole[counter_y][self._x - 1] == 1 or pole._pole[counter_y][self._x] == 1 or \
+                            pole._pole[counter_y][self._x + 1] == 1:
+                        return True
+                    if pole._pole[counter_y + 1][self._x - 1] == 1 or pole._pole[counter_y + 1][self._x] == 1 or \
+                            pole._pole[counter_y + 1][self._x + 1] == 1:
+                        return True
+
+                if counter_y == 9:
+                    if pole._pole[counter_y - 1][self._x - 1] == 1 or pole._pole[counter_y - 1][self._x] == 1 or \
+                            pole._pole[counter_y - 1][self._x + 1] == 1:
+                        return True
+                    if pole._pole[counter_y][self._x - 1] == 1 or pole._pole[counter_y][self._x] == 1 or \
+                            pole._pole[counter_y][self._x + 1] == 1:
+                        return True
+
                 counter_y += 1
+
         return False
 
     def is_out_pole(self, game_pole_size):
