@@ -120,6 +120,24 @@ class Ship:
             return True
         return False
 
+    def get_coods(self):
+        coord_x = self._x
+        coord_y = self._y
+        coords_of_ship = []
+        if self._tp == 1:
+            for deck in range(self._length):
+                coords_of_ship.append((coord_y, coord_x))
+                coord_x += 1
+        if self._tp == 2:
+            for deck in range(self._length):
+                coords_of_ship.append((coord_y, coord_x))
+                coord_y += 1
+        return coords_of_ship
+
+    def hit_the_ship(self, coord):
+        deck = self.get_coods().index(coord)
+        self._cells[deck] = 2
+
     def __check_indx(self, indx):
         """Index check for __getitem__ and __setitem__"""
         if type(indx) != int or indx not in range(0, self._length):

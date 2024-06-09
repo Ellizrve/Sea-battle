@@ -1,3 +1,5 @@
+import random
+import ship as s
 from random import randint, randrange
 
 
@@ -29,7 +31,7 @@ class GamePole:
         length_of_ships = 4
         while amount_of_ships != 5:
             for i in range(amount_of_ships):
-                self._ships.append(Ship(length_of_ships, tp=randint(1, 2)))
+                self._ships.append(s.Ship(length_of_ships, tp=randint(1, 2)))
             amount_of_ships += 1
             length_of_ships -= 1
 
