@@ -120,22 +120,22 @@ class Ship:
             return True
         return False
 
-    def get_coods(self):
+    def get_coords(self):
         coord_x = self._x
         coord_y = self._y
         coords_of_ship = []
         if self._tp == 1:
             for deck in range(self._length):
-                coords_of_ship.append((coord_y, coord_x))
+                coords_of_ship.append((coord_x, coord_y))
                 coord_x += 1
         if self._tp == 2:
             for deck in range(self._length):
-                coords_of_ship.append((coord_y, coord_x))
+                coords_of_ship.append((coord_x, coord_y))
                 coord_y += 1
         return coords_of_ship
 
     def hit_the_ship(self, coord):
-        deck = self.get_coods().index(coord)
+        deck = self.get_coords().index(coord)
         self._cells[deck] = 2
 
     def __check_indx(self, indx):

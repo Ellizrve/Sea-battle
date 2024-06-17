@@ -1,3 +1,5 @@
+import math
+
 import gamepole as gp
 import pygame
 import random
@@ -8,11 +10,21 @@ player.init()
 computer = gp.GamePole(10)
 computer.init()
 
+
+def human_ships_working():
+    return player._ships
+
+
+def computer_ships_working():
+    return computer._ships
+
+
 pole_size = player._size
 indent = pole_size / 2
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+PINK = (230, 50, 230)
 
 block_sz, left_mn, upper_mn = 50, 200, 100
 window_size = left_mn + (3 * pole_size) * block_sz, upper_mn + (pole_size + pole_size / 2) * block_sz
@@ -24,6 +36,12 @@ pygame.display.set_caption("Sea Battle")
 
 pygame.display.flip()
 font = pygame.font.SysFont('arial', font_size)
+
+computer_available_to_fire_set = set((x, y) for x in range(0, pole_size) for y in range(0, pole_size))
+around_last_computer_hit_set = set()
+last_hits_list = []
+ruined_decks_of_computer_ships = []
+ruined_decks_of_player_ships = []
 
 
 def naming():
@@ -98,17 +116,81 @@ def draw_ships(ships):
         pygame.draw.rect(screen, BLACK, ((x, y), (ship_width, ship_height)), width=block_sz//pole_size)
 
 
-def main():
-    game_over = False
+def computer_shoots(set_to_shoot_from):
+    pygame.time.delay(800)
+    computer_fired_block = random.choice(tuple(set_to_shoot_from))
+    computer_available_to_fire_set.discard(computer_fired_block)
+    return check_hit_or_miss(computer_fired_block, human_ships_working(), True)
+
+
+def check_hit_or_miss(fired_block, opponents_ships, computer_queue):
+    for opponents_ship in opponents_ships:
+        if fired_block in opponents_ship.get_coords():
+            opponents_ship.hit_the_ship(fired_block)
+
+            if computer_queue:
+                last_hits_list.append(fired_block)
+                ruined_decks_of_player_ships.append(fired_block)
+            else:
+                ruined_decks_of_computer_ships.append(fired_block)
+            return True
+
+    return False
+
+
+def draw_ruined_players_deck(ruined_decks_of_players_ships):
+    for deck in ruined_decks_of_players_ships:
+        x_start, y_start = deck
+        x = block_sz * x_start + left_mn
+        x += (pole_size + indent) * block_sz
+        y = block_sz * y_start + upper_mn
+        pygame.draw.rect(screen, PINK, ((x, y), (block_sz, block_sz)))
+
+
+def draw_ruined_computers_deck(ruined_decks_of_computers_ships):
+    for deck in ruined_decks_of_computers_ships:
+        x_start, y_start = deck
+        x = block_sz * x_start + left_mn
+        y = block_sz * y_start + upper_mn
+        pygame.draw.rect(screen, PINK, ((x, y), (block_sz, block_sz)))
+
+
+def draw_field():
     screen.fill(WHITE)
     draw_pole()
     draw_ships(computer.get_ships())
     draw_ships(player.get_ships())
+    draw_ruined_players_deck(ruined_decks_of_player_ships)
+    draw_ruined_computers_deck(ruined_decks_of_computer_ships)
     pygame.display.update()
+
+
+def main():
+    game_over = False
+    computer_queue = False
+    draw_field()
     while not game_over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
+            elif not computer_queue and event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if (left_mn <= math.floor(x) <= left_mn + pole_size * block_sz and
+                        upper_mn <= math.floor(y) <= upper_mn + pole_size * block_sz):
+                    fired_block = (math.floor(x) - left_mn) // block_sz, (math.floor(y) - upper_mn) // block_sz
+                computer_queue = not check_hit_or_miss(fired_block, computer_ships_working(), computer_queue)
+                draw_ruined_computers_deck(ruined_decks_of_computer_ships)
+                computer.move_ships()
+
+            elif computer_queue:
+                if around_last_computer_hit_set:
+                    computer_queue = computer_shoots(around_last_computer_hit_set)
+                else:
+                    computer_queue = computer_shoots(computer_available_to_fire_set)
+                draw_ruined_players_deck(ruined_decks_of_player_ships)
+                player.move_ships()
+
+        draw_field()
 
 
 main()
